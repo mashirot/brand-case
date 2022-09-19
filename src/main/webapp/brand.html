@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Brand</title>
+    <script src="https://cdn.feczine.cn/library/vue/vue.global-3.2.39.js"></script>
+    <script src="https://cdn.feczine.cn/library/axios/axios.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <h3>{{ username }}，欢迎您</h3>
+    <p>
+        <label for="getBrandById"></label><input id="getBrandById" v-model="getBrandId" placeholder="查询ID" type="text"><button @click="getBrandById()" type="button">查询</button>
+        <table v-if="getBrandIdResult != null && getBrandIdResult[0] !== null" width=50%" border="1" cellspacing="0">
+            <tr align="center">
+                <th>品牌Id</th>
+                <th>品牌名</th>
+                <th>公司名</th>
+                <th>排序</th>
+                <th>描述</th>
+                <th>状态</th>
+            </tr>
+            <tr align="center" v-for="brand in getBrandIdResult">
+                <td>{{  brand.id  }}</td>
+                <td>{{  brand.brandName  }}</td>
+                <td>{{  brand.companyName  }}</td>
+                <td>{{  brand.ordered  }}</td>
+                <td>{{  brand.description  }}</td>
+                <td>{{  brand.status === 0 ? "禁用" : "启用"  }}</td>
+            </tr>
+        </table>
+    <p>
+        <label for="getBrandByBrandName"></label><input id="getBrandByBrandName" v-model="getBrandName" placeholder="查询品牌名" type="text"><button @click="getBrandByBrandName()" type="button">查询</button>
+        <table v-if="getBrandNameResult !== null && getBrandNameResult[0] !== null" width=50%" border="1" cellspacing="0">
+            <tr align="center">
+                <th>品牌Id</th>
+                <th>品牌名</th>
+                <th>公司名</th>
+                <th>排序</th>
+                <th>描述</th>
+                <th>状态</th>
+            </tr>
+            <tr align="center" v-for="brand in getBrandNameResult">
+                <td>{{  brand.id  }}</td>
+                <td>{{  brand.brandName  }}</td>
+                <td>{{  brand.companyName  }}</td>
+                <td>{{  brand.ordered  }}</td>
+                <td>{{  brand.description  }}</td>
+                <td>{{  brand.status === 0 ? "禁用" : "启用"  }}</td>
+            </tr>
+        </table>
+    <p>
+        <label for="delBrandById"></label><input id="delBrandById" v-model="delBrandId" placeholder="删除Id" type="text">
+        <button @click="delBrandById()" type="button">删除</button>
+    </p>
+    <p>
+        <label for="addBrandName"></label><input id="addBrandName" v-model="addBrandName" placeholder="品牌名" type="text">
+        <label for="addCompanyName"></label><input id="addCompanyName" v-model="addCompanyName" placeholder="公司名" type="text">
+        <label for="addOrdered"></label><input id="addOrdered" v-model.number="addOrdered" placeholder="优先级" type="text">
+        <label for="addDescription"></label><input id="addDescription" v-model="addDescription" placeholder="描述" type="text">
+        <label for="addStatus"></label><input id="addStatus" v-model.number="addStatus" placeholder="是否启用" type="text">
+        <button @click="addBrand()" type="button">添加</button>
+    </p>
+    <hr>
+    <table width=50%" border="1" cellspacing="0">
+        <tr align="center">
+            <th>品牌Id</th>
+            <th>品牌名</th>
+            <th>公司名</th>
+            <th>排序</th>
+            <th>描述</th>
+            <th>状态</th>
+        </tr>
+        <tr align="center" v-if="brandList !== null" v-for="brand in brandList">
+            <td>{{  brand.id  }}</td>
+            <td>{{  brand.brandName  }}</td>
+            <td>{{  brand.companyName  }}</td>
+            <td>{{  brand.ordered  }}</td>
+            <td>{{  brand.description  }}</td>
+            <td>{{  brand.status === 0 ? "禁用" : "启用"  }}</td>
+        </tr>
+    </table>
+</div>
+<script>
+    getSession();
+    listAllBrand();
+    const app = Vue.createApp({
+        data() {
+            return {
+                username: "",
+                getBrandId: null,
+                getBrandName: null,
+                brandList: null,
+                getBrandIdResult: null,
+                getBrandNameResult: null,
+                addBrandName: null,
+                addCompanyName: null,
+                addOrdered: null,
+                addDescription: null,
+                addStatus: null,
+                delBrandId: null
+            }
+        },
+        methods: {
+            getBrandById() {
+                const _this = this;
+                if (this.getBrandId == null) {
+                    alert("请输入id");
+                    return;
+                }
+                axios.post('/brand_case_war/brand/getBrandById', {
+                    id: this.getBrandId
+                }).then(function (response) {
+                    if (response.data.result !== undefined) {
+                        _this.getBrandIdResult = null;
+                        alert("无结果");
+                        return;
+                    }
+                    _this.getBrandIdResult = response.data;
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+            getBrandByBrandName() {
+                const _this = this;
+                if (this.getBrandName == null) {
+                    alert("请输入查询内容");
+                    return;
+                }
+                axios.post('/brand_case_war/brand/listBrandsByBrandName', {
+                    brandName: this.getBrandName
+                }).then(function (response) {
+                    if (response.data.result !== undefined) {
+                        _this.getBrandNameResult = null;
+                        alert("无结果");
+                        return;
+                    }
+                    _this.getBrandNameResult = response.data;
+                }).catch(function (error) {
+                    console.log(error);
+                });
+                // axios({
+                //     url: '/brand_case_war/brand/listBrandsByBrandName',
+                //     method: 'post',
+                //     headers: {'content-type': 'application/json;charset=UTF-8'},
+                //     data: {
+                //         brandName: this.getBrandName
+                //     }
+                // }).then(function (response) {
+                //     if (response.data.result !== undefined) {
+                //         _this.getBrandNameResult = null;
+                //         alert("无结果");
+                //         return;
+                //     }
+                //     _this.getBrandNameResult = response.data;
+                // }).catch(function (error) {
+                //     console.log(error);
+                // });
+            },
+            addBrand() {
+                const _this = this;
+                if(_this.addBrandName == null) {
+                    alert("品牌名不得为空");
+                    return;
+                }
+                if(_this.addCompanyName == null) {
+                    alert("公司名不得为空");
+                    return;
+                }
+                if(_this.addOrdered == null) {
+                    alert("优先度不得为空");
+                    return;
+                }
+                if(_this.addDescription == null) {
+                    alert("描述不得为空");
+                    return;
+                }
+                if(_this.addStatus == null) {
+                    alert("启用状态不得为空");
+                    return;
+                }
+                axios.post('/brand_case_war/brand/saveBrand', {
+                    brandName: _this.addBrandName,
+                    companyName: _this.addCompanyName,
+                    ordered: _this.addOrdered,
+                    description: _this.addDescription,
+                    status: _this.addStatus
+                }).then(function (response) {
+                    if (response.data.result === false) {
+                        alert("添加失败");
+                        return;
+                    }
+                    alert("添加成功");
+                    _this.addBrandName = null;
+                    _this.addCompanyName = null;
+                    _this.addOrdered = null;
+                    _this.addDescription = null;
+                    _this.addStatus = null;
+                    listAllBrand();
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+            delBrandById() {
+                const _this = this;
+                axios.post('/brand_case_war/brand/deleteBrandById', {
+                    id: _this.delBrandId
+                }).then(function (response) {
+                    if (response.data.result === false) {
+                        alert("删除失败");
+                        _this.delBrandId = null;
+                        return;
+                    }
+                    alert("删除成功");
+                    _this.delBrandId = null;
+                    listAllBrand();
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+    }).mount("#app");
+    function listAllBrand() {
+        axios.post('/brand_case_war/brand/listAllBrands', {
+        }).then(function (response) {
+            app.brandList = response.data;
+        }).catch(function (error) {
+            console.log(error);
+        });
+    }
+    function getSession() {
+        axios.post('/brand_case_war/brand/returnSession', {
+        }).then(function (response) {
+            app.username = response.data.username;
+        }).catch(function (error) {
+            console.log(error);
+        });
+    }
+</script>
+</body>
+</html>

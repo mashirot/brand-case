@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <script src="https://cdn.feczine.cn/library/vue/vue.global-3.2.39.js"></script>
+    <script src="https://cdn.feczine.cn/library/axios/axios.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <label for="username">用户名：</label><input id="username" name="username" placeholder="用户名" v-model="username" type="text"><br>
+    <label for="password">密码：</label><input id="password" name="password" placeholder="密码" v-model="password" type="password"><br>
+    <input type="checkbox" @click="remember = !remember">记住我<br>
+    <button @click="subData()">登录</button>
+    <button @click="_window.location='/brand_case_war/register.html'">注册</button>
+</div>
+<script>
+    const _window = window;
+    const app = Vue.createApp({
+        data() {
+            return {
+                username: "",
+                password: "",
+                remember: false
+            }
+        },
+        methods: {
+            subData() {
+                if (this.username.trim() !== "" && this.password.trim() !== "") {
+                    axios.post("/brand_case_war/user/getUser", {
+                        // username: document.getElementById("username").value,
+                        // password: document.getElementById("password").value
+                        username: this.username.trim(),
+                        password: this.password.trim(),
+                        remember: this.remember
+                    }).then(function (response) {
+                        if (response.data.status) {
+                            alert("登陆成功，点击确认后跳转");
+                            _window.location='/brand_case_war/userAdmin.html';
+                        } else {
+                            alert("登陆失败");
+                        }
+                    });
+                } else {
+                    alert("用户名密码不得为空");
+                }
+            }
+        }
+    }).mount("#app");
+
+    function getCookie(cname) {
+        let name = cname + "=";
+        let ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i].trim();
+            if (c.indexOf(name) === 0) return c.substring(name.length,c.length);
+        }
+        return "";
+    }
+    let username = getCookie("username");
+    let password = getCookie("password");
+    if (username != null) app.username = username;
+    if (username != null) app.password = password;
+</script>
+</body>
+</html>

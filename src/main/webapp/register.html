@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <script src="https://cdn.feczine.cn/library/vue/vue.global-3.2.39.js"></script>
+    <script src="https://cdn.feczine.cn/library/axios/axios.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <form>
+        <label for="username">用户名：</label><input id="username" v-model="username" type="text" placeholder="用户名"><br>
+        <label for="password">密码：</label><input id="password" v-model="password" type="password" placeholder="密码"><br>
+        <label for="confPassword">确认密码：</label><input id="confPassword" v-model="confPassword" type="password" placeholder="确认密码"><br>
+        <button type="button" @click="reg()">注册</button><input name="reset" type="reset" value="重置">
+    </form>
+</div>
+<script>
+    const _window = window;
+    const app = Vue.createApp({
+        data() {
+            return {
+                username: "",
+                password: "",
+                confPassword: ""
+            }
+        },
+        methods: {
+            reg() {
+                if (app.username.trim() !== "" && app.password.trim() !== "" && app.confPassword.trim() !== "") {
+                    if (app.password.trim() === app.confPassword.trim()) {
+                        axios.post("/brand_case_war/user/saveUser", {
+                            username: app.username.trim(),
+                            password: app.password.trim()
+                        }).then(function (response) {
+                            if (response.data.username === app.username && response.data.status) {
+                                alert("注册成功，点击确认后跳转登录");
+                                _window.location='/brand-case/login.html';
+                            } else {
+                                alert("用户名重复");
+                            }
+                        }).catch(function (error) {
+                            console.log(error);
+                        });
+                    } else {
+                        alert("两次输入的密码不一致");
+                    }
+                } else {
+                    alert("用户名,密码不得为空");
+                }
+            }
+        },
+      }).mount("#app");
+</script>
+</body>
+</html>

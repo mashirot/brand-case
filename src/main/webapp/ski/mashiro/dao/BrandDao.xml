@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ski.mashiro.dao.BrandDao">
+    <resultMap id="brandResultMap" type="ski.mashiro.pojo.Brand">
+        <result column="company_name" property="companyName"/>
+        <result column="brand_name" property="brandName"/>
+    </resultMap>
+    <insert id="saveBrand" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_brand (brand_name, company_name, ordered, description, status)
+        values (#{brand.brandName}, #{brand.companyName}, #{brand.ordered}, #{brand.description}, #{brand.status});
+    </insert>
+    <delete id="deleteBrandById">
+        delete from tb_brand where id = #{id};
+    </delete>
+    <select id="listAllBrands" resultMap="brandResultMap">
+        select id, brand_name, company_name, ordered, description, status from tb_brand;
+    </select>
+    <select id="getBrandById" resultMap="brandResultMap">
+        select id, brand_name, company_name, ordered, description, status from tb_brand where id = #{id};
+    </select>
+    <select id="listBrandsByBrandName" resultMap="brandResultMap">
+        select id, brand_name, company_name, ordered, description, status from tb_brand where brand_name like concat('%',#{brandName},'%');
+    </select>
+</mapper>

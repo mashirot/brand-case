@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin</title>
+    <script src="https://cdn.feczine.cn/library/vue/vue.global-3.2.39.js"></script>
+    <script src="https://cdn.feczine.cn/library/axios/axios.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <h1>{{ username }}，欢迎你！</h1>
+    <p>
+        <label for="delUser">删除用户: </label><input id="delUser" v-model.number="delUserId" placeholder="请输入数字" type="number" >
+        <button @click="delUser()" type="button">删除</button><br>
+    </p>
+    <button @click="getAllUser(); isFold = !isFold" v-if="!isFold" type="button">展开用户列表</button>
+    <button @click="isShowAllUser = !isShowAllUser; isFold = !isFold" v-if="isFold" type="button">收起用户列表</button>
+    <table v-if="isShowAllUser" width=15%" border="1" cellspacing="0">
+        <tr  align="center">
+            <th>用户ID</th>
+            <th>用户名</th>
+        </tr>
+        <tr align="center" v-for="user in _userList">
+            <td>{{user.id}}</td>
+            <td>{{user.username}}</td>
+        </tr>
+    </table>
+    <p><button @click="_window.location='/brand_case_war/brand.html'" type="button">品牌界面</button></p>
+</div>
+<script>
+    const _window = window;
+    let _userList = [];
+    getSession();
+    const app = Vue.createApp({
+        data() {
+            return {
+                username: null,
+                delUserId: null,
+                isShowAllUser: false,
+                isFold: false
+            }
+        },
+        methods: {
+            delUser() {
+                axios.post('/brand_case_war/user/deleteUserById', {
+                    id: this.delUserId
+                }).then(function (response) {
+                    if (response.data.result) {
+                        alert("删除成功");
+                    } else {
+                        alert("删除失败");
+                    }
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+            getAllUser() {
+                let _this = this;
+                if (!this.isShowAllUser) {
+                    axios.post('/brand_case_war/user/listAllUser', {
+                    }).then(function (response) {
+                        _userList = response.data;
+                        _this.isShowAllUser = !_this.isShowAllUser;
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                }
+            }
+        }
+    }).mount("#app");
+    function getSession() {
+        axios.post('/brand_case_war/user/returnSession', {
+        }).then(function (response) {
+            app.username = response.data.username;
+        }).catch(function (error) {
+            console.log(error);
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ski.mashiro.dao.UserDao">
+<!--    insert into tb_user (username, password) VALUES (#{user.username}, #{user.password});-->
+    <insert id="saveUser" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_user (username, password)
+        select #{user.username}, #{user.password}
+        where not exists (select username from tb_user where username = #{user.username});
+    </insert>
+
+    <delete id="deleteUserById">
+        delete from tb_user where id = #{id};
+    </delete>
+
+    <select id="getUser" resultType="ski.mashiro.pojo.User">
+        select id, username, password from tb_user
+        where username = #{user.username} and password = #{user.password};
+    </select>
+
+    <select id="listAllUser" resultType="ski.mashiro.pojo.User">
+        select id, username from tb_user;
+    </select>
+</mapper>
